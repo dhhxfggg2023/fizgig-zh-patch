@@ -1,0 +1,16 @@
+Fizgig Chinese Patch (fizgig-zh-patch)
+Copyright 2026 fizgig-zh-patch contributors
+
+This product includes a Chinese translation of the user interface strings of:
+
+  Fizgig — Klein 9B LoRA Trainer & Workbench
+  Copyright 2026 Peter Neill
+  https://github.com/shootthesound/Fizgig
+  Licensed under the Apache License, Version 2.0
+
+The file `dictionary.json` in this distribution is a translation of the
+interface text of the above work, and is therefore a derivative work
+distributed under the same Apache License, Version 2.0.
+
+This patch is an independent, unofficial tool. It is not affiliated with,
+endorsed by, or supported by the authors of Fizgig.

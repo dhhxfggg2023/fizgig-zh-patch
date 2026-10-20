@@ -1,0 +1,43 @@
+# 本机的 Fizgig 路径（不公开）
+fizgig_root.txt
+
+# 安装状态与备份（含 Fizgig 自己的源码，绝不入库）
+installed.json
+backup/
+
+# python 缓存
+__pycache__/
+*.pyc
+
+# --- 开发/测试脚本：只在本机保留，不随仓库发布 ---
+# 提取与诊断工具
+selftest.py
+build_vocab.py
+compute_gap.py
+filter_gap.py
+diag_block.py
+diag_match.py
+diag_prose_left.py
+classify_js.py
+audit_dict.py
+# 合并与校验工具
+merge_all.py
+merge_parts.py
+verify_part.py
+verify_mz.py
+# 分批翻译的中间产物
+parts/
+
+# 体检脚本的临时输出
+audit.txt
+audit_short.txt
+js_classify.txt
+unreached.txt
+appjs_misses.txt
+diag_block.txt
+left.json
+missing.json
+missing_prose.json
+mz_*.json
+lt_*.json
+vocabulary.json
