@@ -166,6 +166,97 @@
     }
   }
 
+  /* A paragraph with a link or <b> in the middle of it arrives as several
+     text nodes ("...through its" + <a>File manager</a> + "; on your own
+     server..."), so no single node ever matches the dictionary. Walk the whole
+     element's text, translate the joined sentence, then write the pieces back
+     in the same order. Only used when the parts do NOT translate one by one:
+     that keeps normal markup (bold words, links) exactly as it was. */
+  var BLOCKISH = { P: 1, DIV: 1, LI: 1, TD: 1, TH: 1, DD: 1, DT: 1, BLOCKQUOTE: 1,
+                   H1: 1, H2: 1, H3: 1, H4: 1, H5: 1, H6: 1, FIGCAPTION: 1, LABEL: 1 };
+  var INLINE_OK = { A: 1, B: 1, I: 1, EM: 1, STRONG: 1, CODE: 1, SPAN: 1, SMALL: 1,
+                    U: 1, S: 1, BR: 1, FONT: 1, MARK: 1, SUB: 1, SUP: 1 };
+
+  function partsOf(el, out) {
+    for (var c = el.firstChild; c; c = c.nextSibling) {
+      if (c.nodeType === 3) {
+        if (c.data) out.push({ node: c, text: c.data });
+      } else if (c.nodeType === 1) {
+        if (c.tagName === "BR") { out.push({ node: null, text: "\n" }); continue; }
+        if (INLINE_OK[c.tagName] && !c.hasAttribute("data-zh-skip")) {
+          var kids = [];
+          partsOf(c, kids);
+          for (var i = 0; i < kids.length; i++) out.push(kids[i]);
+          continue;
+        }
+        return null;                       /* something we must not merge across */
+      }
+    }
+    return out;
+  }
+
+  function paragraph(el) {
+    if (!BLOCKISH[el.tagName] || el.hasAttribute("data-zh-skip")) return;
+    var parts = partsOf(el, []);
+    if (!parts || parts.length < 2) return;       /* single node: handled already */
+    var hasLink = false;
+    for (var c = el.firstChild; c; c = c.nextSibling) {
+      if (c.nodeType === 1 && c.tagName === "A") hasLink = true;
+    }
+    var joined = "", texts = [];
+    for (var i = 0; i < parts.length; i++) {
+      texts.push(parts[i].text);
+      joined += parts[i].text;
+    }
+    var zh = lookupSmart(joined.replace(/\s+/g, " ").trim());
+    if (zh === null) return;
+    var pieces = zh.split(/\s+/);
+    /* the translated sentence has to be laid back over the original pieces:
+       give each original part a share of the words by its own word count. */
+    var counts = texts.map(function (t) { return (t.match(/\S+/g) || []).length; });
+    var total = counts.reduce(function (a, b) { return a + b; }, 0);
+    if (!total) return;
+    if (hasLink) {
+      /* a link in the middle: keep its text, translate the text around it only */
+      var out2 = [];
+      for (var k = 0; k < parts.length; k++) {
+        out2.push(translatePiece(texts[k]));
+      }
+      for (var k2 = 0; k2 < parts.length; k2++) {
+        var nd = parts[k2].node;
+        if (!nd) continue;
+        if (!out2[k2] || out2[k2] === texts[k2]) continue;
+        nd.__zh = out2[k2];
+        nd.data = out2[k2];
+      }
+      return;
+    }
+    var at = 0;
+    for (var m = 0; m < parts.length; m++) {
+      var take = Math.round(pieces.length * (counts[m] / total));
+      if (m === parts.length - 1) take = pieces.length - at;
+      if (take < 0) take = 0;
+      var seg = pieces.slice(at, at + take).join(" ");
+      at += take;
+      var lead = /^\s/.test(texts[m]) ? " " : "";
+      var nd2 = parts[m].node;
+      if (!nd2) continue;
+      if (!seg) continue;
+      var z = lead + seg;
+      nd2.__zh = z;
+      nd2.data = z;
+    }
+  }
+
+  /* one piece on its own (used around a link) */
+  function translatePiece(t) {
+    var lead = t.match(/^\s*/)[0], trail = t.match(/\s*$/)[0];
+    var body = t.slice(lead.length, t.length - trail.length);
+    if (!body) return t;
+    var z = lookupSmart(body);
+    return z === null ? t : lead + z + trail;
+  }
+
   function walk(root) {
     if (!root) return;
     if (root.nodeType === 3) { textNode(root); return; }
@@ -175,6 +266,11 @@
     var n;
     while ((n = walker.nextNode())) {
       if (n.nodeType === 1) element(n); else textNode(n);
+    }
+    if (root.nodeType === 1) paragraph(root);
+    var blocks = root.querySelectorAll ? root.querySelectorAll("p,div,li,h1,h2,h3,h4,td,th,label,figcaption,blockquote") : [];
+    for (var b = 0; b < blocks.length; b++) {
+      try { paragraph(blocks[b]); } catch (e) {}
     }
   }
 
