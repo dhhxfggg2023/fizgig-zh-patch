@@ -51,6 +51,24 @@
     return null;
   }
 
+  /* The app builds some labels at draw time: "Output Directory" becomes
+     "Output Directory:", a section title becomes "▶ Training Parameters".
+     Try the bare string for those, and put the decoration back. */
+  function lookupSmart(plain) {
+    var hit = lookup(plain);
+    if (hit !== null) return hit;
+    var m = /^([▶▼•·‣▪\-–—*]\s+)([\s\S]+)$/.exec(plain);
+    if (m) {
+      var inner = lookupSmart(m[2]);
+      if (inner !== null) return m[1] + inner;
+    }
+    if (plain.charAt(plain.length - 1) === ":") {
+      var bare = lookupSmart(plain.slice(0, -1));
+      if (bare !== null) return bare + "：";
+    }
+    return null;
+  }
+
   /* Translate one run of text, keeping its surrounding whitespace intact. */
   function tr(s) {
     if (!s) return null;
@@ -59,7 +77,7 @@
     var trail = s.match(/\s*$/)[0];
     var body = s.slice(lead.length, s.length - trail.length);
     if (!body) return null;
-    var zh = lookup(body);
+    var zh = lookupSmart(body);
     if (zh === null || zh === undefined || zh === body) return null;
     return lead + zh + trail;
   }
