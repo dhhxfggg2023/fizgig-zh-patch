@@ -37,6 +37,22 @@
     return out.replace(/([\u4e00-\u9fff])s(?![A-Za-z])/g, "$1");
   }
 
+  /* A multi-line hint is often drawn as one block, or split into its lines:
+     try each line, then the whole thing with its newlines collapsed. */
+  function lookupLines(plain) {
+    if (plain.indexOf("\n") < 0) return null;
+    var parts = plain.split("\n");
+    var out = [];
+    for (var i = 0; i < parts.length; i++) {
+      var t = parts[i];
+      if (!t.trim()) { out.push(t); continue; }
+      var z = lookupSmart(t);
+      if (z === null) return null;        /* 有一段没翻，就整段不翻，免得半中半英 */
+      out.push(z);
+    }
+    return out.join("\n");
+  }
+
   function lookup(plain) {
     var hit = EXACT[plain];
     if (hit !== undefined) return hit;
@@ -55,6 +71,8 @@
      "Output Directory:", a section title becomes "▶ Training Parameters".
      Try the bare string for those, and put the decoration back. */
   function lookupSmart(plain) {
+    var lines = lookupLines(plain);
+    if (lines !== null) return lines;
     var hit = lookup(plain);
     if (hit !== null) return hit;
     var m = /^([▶▼•·‣▪\-–—*]\s+)([\s\S]+)$/.exec(plain);
