@@ -1,40 +1,31 @@
-"""Fizgig 汉化补丁 · 安装 / 卸载 / 检查
+# -*- coding: utf-8 -*-
+"""Fizgig 汉化补丁 · 安装 / 卸载 / 状态 / 体检
 
-用法：
+只改 Fizgig 网页界面的三个静态文件：
 
-    python install.py            # 安装汉化
-    python install.py uninstall  # 卸载汉化（完全恢复英文）
-    python install.py status     # 查看当前状态
-    python install.py check      # 只做体检，不改任何文件
+    src/fizgig/web/static/index.html
+    src/fizgig/web/static/app.js
+    src/fizgig/web/static/style.css
 
-补丁会自己找 Fizgig：先看环境变量 FIZGIG_ROOT，再看本文件夹旁边的
-fizgig_root.txt，再看本文件夹的上一级（<Fizgig>/zh_patch/ 这种放法最省事），
-最后看常见安装位置。找不到就按提示选一种方式告诉它。
+外加在 index.html 的 </body> 前插入一段带标记的 <script>（译文表 + 运行时
+翻译器），用来翻译后端发来的文字和运行时才拼出来的界面。
 
-安装做了什么
-------------
-  1. 把 src/fizgig/web/static/ 下的 index.html / app.js / style.css 原件
-     备份到 backup/（带时间戳，卸载时原样写回）
-  2. 按 dictionary.json 把「显示用的英文」替换成中文
-  3. 改完后自检：app.js 必须仍能被 node 解析；所有 === 比较用到的字符串
-     必须一字不差；HTML 标签必须配平。任何一项不过就自动回滚。
+**只靠脚本就能汉化，也只靠脚本就能还原**：安装时把「改了哪几个字节、原文是
+什么」写进 rollback.json，还原时按字节原样倒回去（带 sha256 校验），不需要
+git、不需要网络、不需要手动备份。git 只是最后的兜底手段。
 
-卸载做了什么
-------------
-  把 backup/ 里保存的原件原样写回去，界面立刻变回英文。
-  因为改的只是这三个静态文件，卸载不会影响任何配置、模型、LoRA 或训练数据。
-
-关于 git
---------
-Fizgig 是 git 仓库，这三个文件是被跟踪的。安装后 `git status` 会显示它们被
-修改 —— 这不影响使用。想让 git 忽略，用：
-
-    git update-index --skip-worktree src/fizgig/web/static/index.html ...
+    python install.py            # 安装 / 重新安装（更新译文）
+    python install.py uninstall  # 还原英文
+    python install.py status     # 看当前状态
+    python install.py check      # 只体检，不改任何文件
+    python install.py block      # 打印要插入的那段 script（调试用）
 """
 import argparse
+import hashlib
 import io
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -44,209 +35,428 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import config
 
-ROOT = config.find_root()
-if not ROOT:
-    raise SystemExit(
-        "找不到 Fizgig。请任选一种方式告诉本补丁 Fizgig 在哪：\n"
-        "  1) 把本文件夹放进 Fizgig 根目录（推荐）：<Fizgig>\\zh_patch\\\n"
-        "  2) 设环境变量 FIZGIG_ROOT 指向 Fizgig 根目录\n"
-        "  3) 在本文件夹里建一个 fizgig_root.txt，内容写 Fizgig 根目录路径")
-STATIC = config.static_dir(ROOT)
+MARK_START = "<!-- zh_patch:start -->"
+MARK_END = "<!-- zh_patch:end -->"
+# the block is inserted as mark + script + end + one newline. Swallow exactly
+# that newline (never the file's own whitespace) so removing it is byte-exact.
+BLOCK_RE = re.compile(re.escape(MARK_START) + r".*?" + re.escape(MARK_END) + "\\n?", re.S)
 FILES = ("index.html", "app.js", "style.css")
-BACKUP = os.path.join(HERE, "backup")
+PACK_JS = os.path.join(HERE, "zh_pack.js")
+RUNTIME_JS = os.path.join(HERE, "zh_runtime.js")
 DICT = os.path.join(HERE, "dictionary.json")
+TEMPLATES = os.path.join(HERE, "templates.json")
 CONFLICTS = os.path.join(HERE, "conflicts.json")
+BACKUP = os.environ.get("ZH_PATCH_BACKUP") or os.path.join(HERE, "backup")
 STAMP = os.path.join(HERE, "installed.json")
+ROLLBACK = os.path.join(HERE, "rollback.json")
+
+ROOT = config.find_root()
+STATIC = config.static_dir(ROOT) if ROOT else None
 
 import patchlib
 
 
+def read(p):
+    # newline="" keeps CRLF exactly as it is on disk: the restore must be
+    # byte-for-byte identical, and git should not see a line-ending change.
+    return io.open(p, encoding="utf-8", newline="").read()
+
+
+def write(p, t):
+    with io.open(p, "w", encoding="utf-8", newline="") as f:
+        f.write(t)
+
+
+def sha(t):
+    return hashlib.sha256(t.encode("utf-8")).hexdigest()
+
+
+def target_path():
+    if not STATIC:
+        raise SystemExit(
+            "找不到 Fizgig。请任选一种方式告诉本补丁 Fizgig 在哪：\n"
+            "  1) 把本文件夹放进 Fizgig 根目录（推荐）：<Fizgig>\\zh_patch\\\n"
+            "  2) 设环境变量 FIZGIG_ROOT 指向 Fizgig 根目录\n"
+            "  3) 在本文件夹里建一个 fizgig_root.txt，内容写 Fizgig 根目录路径")
+    return os.path.join(STATIC, "index.html")
+
+
+def strip_patch(html):
+    return BLOCK_RE.sub("", html)
+
+
+def ensure_pack(quiet=False):
+    """编译 zh_pack.js（缺文件、或词表比它新时自动重编）。
+
+    这样仓库里只需要词表源码，别人下载下来直接就能用，不用先手动 build。
+    """
+    srcs = [DICT, TEMPLATES, os.path.join(HERE, "skip.json"),
+            os.path.join(HERE, "build_pack.py")]
+    need = not os.path.isfile(PACK_JS)
+    if not need:
+        try:
+            newest = max(os.path.getmtime(p) for p in srcs if os.path.isfile(p))
+            need = os.path.getmtime(PACK_JS) < newest
+        except OSError:
+            need = True
+    if not need:
+        return
+    import build_pack
+    n, t, s = build_pack.build(quiet=True)
+    if not quiet:
+        print("BUILT zh_pack.js（%d 词条 / %d 模板）" % (n, t))
+
+
+def build_block():
+    if not os.path.isfile(PACK_JS):
+        raise SystemExit("缺少 zh_pack.js —— 先运行 python build_pack.py")
+    js = read(PACK_JS) + "\n" + read(RUNTIME_JS)
+    js = js.replace("</", "<\\/")            # never let the HTML parser close the script
+    return (MARK_START + "\n<script>\n" + js + "\n</script>\n" + MARK_END + "\n")
+
+
+def inject(html, block):
+    html = strip_patch(html)
+    i = html.rfind("</body>")
+    if i < 0:
+        i = html.rfind("</html>")
+    if i < 0:
+        return html + "\n" + block
+    return html[:i] + block + html[i:]
+
+
+# ---------------------------------------------------------------- 还原
+def _is_pristine(txt):
+    if MARK_START in txt:
+        return False
+    return len([c for c in txt if "\u4e00" <= c <= "\u9fff"]) < 50
+
+
+def reverse_previous():
+    """Undo the recorded install from rollback.json alone. No git, no network."""
+    if not os.path.isfile(ROLLBACK):
+        return False
+    try:
+        m = json.load(io.open(ROLLBACK, encoding="utf-8"))
+    except Exception:
+        return False
+    pristined = {}
+    for f, info in (m.get("files") or {}).items():
+        p = os.path.join(STATIC, f)
+        if not os.path.isfile(p):
+            return False
+        txt = read(p)
+        if sha(txt) != info.get("patched_sha256"):
+            return False                     # the file changed since we patched it
+        if f == "index.html":
+            txt = strip_patch(txt)
+        try:
+            txt = patchlib.reverse_edits(txt, info.get("edits") or [])
+        except SystemExit:
+            return False
+        if sha(txt) != info.get("pristine_sha256"):
+            return False
+        pristined[f] = txt
+    if not pristined:
+        return False
+    for f, txt in pristined.items():         # only write once everything checks out
+        write(os.path.join(STATIC, f), txt)
+    try:
+        os.remove(ROLLBACK)
+    except OSError:
+        pass
+    return True
+
+
+def git_status():
+    return git("status", "--porcelain", "--", "src/fizgig/web/static")
+
+
+def git(*args):
+    if not ROOT:
+        return ""
+    try:
+        r = subprocess.run(["git", "-C", ROOT] + list(args), capture_output=True,
+                           text=True, timeout=60)
+        return (r.stdout + r.stderr).strip()
+    except Exception as e:
+        return "(git unavailable: %s)" % e
+
+
+def git_restore_pristine():
+    if not ROOT or not os.path.isdir(os.path.join(ROOT, ".git")):
+        return False
+    subprocess.run(["git", "-C", ROOT, "checkout", "--",
+                    "src/fizgig/web/static/index.html",
+                    "src/fizgig/web/static/app.js",
+                    "src/fizgig/web/static/style.css"],
+                   capture_output=True, text=True)
+    if git_status().strip():
+        return False
+    try:
+        return _is_pristine(read(os.path.join(STATIC, "index.html")))
+    except OSError:
+        return False
+
+
+def newest_backup(pristine_only=True):
+    if not os.path.isdir(BACKUP):
+        return None
+    dirs = []
+    for d in os.listdir(BACKUP):
+        p = os.path.join(BACKUP, d)
+        idx = os.path.join(p, "index.html")
+        if not (os.path.isdir(p) and os.path.isfile(idx)):
+            continue
+        if pristine_only:
+            try:
+                if not _is_pristine(read(idx)):
+                    continue
+            except OSError:
+                continue
+        dirs.append(p)
+    return max(dirs, key=os.path.getmtime) if dirs else None
+
+
+def restore_from_backup():
+    b = newest_backup()
+    if not b:
+        return False
+    for f in FILES:
+        p = os.path.join(b, f)
+        if os.path.isfile(p):
+            shutil.copy2(p, os.path.join(STATIC, f))
+    try:
+        return _is_pristine(read(os.path.join(STATIC, "index.html")))
+    except OSError:
+        return False
+
+
+def restore_pristine():
+    """Back to the English source. Returns (how, note)."""
+    if reverse_previous():
+        return "rollback", ""
+    if git_restore_pristine():
+        return "git", ""
+    if restore_from_backup():
+        return "backup", ""
+    p = os.path.join(STATIC, "index.html")
+    try:
+        raw = read(p)
+        if MARK_START in raw:
+            write(p, strip_patch(raw))
+            return "strip", ""
+    except OSError:
+        pass
+    return "none", ""
+
+
+# ---------------------------------------------------------------- 安装
+def snapshot(tag, contents):
+    d = os.path.join(BACKUP, tag)
+    os.makedirs(d, exist_ok=True)
+    for f in FILES:
+        p = os.path.join(d, f)
+        if not os.path.isfile(p) and f in contents:
+            write(p, contents[f])
+    return d
+
+
 def find_node():
-    """node is only used to syntax-check the patched app.js. Look for it in
-    the usual places instead of hard-coding anyone's home directory."""
-    cands = []
-    which = shutil.which("node")
-    if which:
-        cands.append(which)
+    cands = [shutil.which("node")]
     for env in ("ProgramFiles", "ProgramFiles(x86)", "LOCALAPPDATA"):
         base = os.environ.get(env)
         if base:
             cands.append(os.path.join(base, "nodejs", "node.exe"))
-    cands.append(os.path.join(ROOT, "venv", "Scripts", "node.exe"))
     for c in cands:
         if c and os.path.isfile(c):
             return c
     return None
 
 
-NODE = find_node()
+def load_pack():
+    d = patchlib.load_dictionary(DICT)
+    c = patchlib.load_conflicts(CONFLICTS)
+    t = []
+    if os.path.isfile(TEMPLATES):
+        t = json.load(io.open(TEMPLATES, encoding="utf-8"))
+    return d, c, t
 
 
-def read(path):
-    return io.open(path, encoding="utf-8").read()
-
-
-def write(path, text):
-    with io.open(path, "w", encoding="utf-8", newline="") as f:
-        f.write(text)
-
-
-def git(*args):
-    try:
-        r = subprocess.run(["git", "-C", ROOT] + list(args),
-                           capture_output=True, text=True, timeout=30)
-        return (r.stdout + r.stderr).strip()
-    except Exception as e:
-        return "(git unavailable: %s)" % e
-
-
-def backup_dir_for(tag):
-    return os.path.join(BACKUP, tag)
-
-
-def snapshot(tag):
-    """Copy the current static files into backup/<tag>/ (once per tag)."""
-    d = backup_dir_for(tag)
-    os.makedirs(d, exist_ok=True)
+def restore_from(contents):
     for f in FILES:
-        p = os.path.join(d, f)
-        if not os.path.isfile(p):
-            shutil.copy2(os.path.join(STATIC, f), p)
-    return d
-
-
-def newest_backup():
-    if not os.path.isdir(BACKUP):
-        return None
-    dirs = [os.path.join(BACKUP, d) for d in os.listdir(BACKUP)
-            if os.path.isdir(os.path.join(BACKUP, d))]
-    if not dirs:
-        return None
-    return max(dirs, key=os.path.getmtime)
+        if f in contents:
+            write(os.path.join(STATIC, f), contents[f])
 
 
 def do_install():
-    if not os.path.isdir(STATIC):
-        print("ERROR Fizgig not found at", ROOT)
+    target_path()
+    how, note = restore_pristine()
+    if how == "git":
+        print("先还原英文（git checkout）")
+    elif how == "backup":
+        print("先还原英文（用备份 %s）" % note)
+    elif how == "strip":
+        print("先去掉上一次注入的 script")
+
+    before = {f: read(os.path.join(STATIC, f)) for f in FILES if os.path.isfile(os.path.join(STATIC, f))}
+    start_index = strip_patch(before.get("index.html", ""))
+    if MARK_START in start_index:
+        print("ERROR index.html 里有多段标记，无法安全处理。")
         return 1
-    dict_ = patchlib.load_dictionary(DICT)
-    conflicts = patchlib.load_conflicts(CONFLICTS)
-    print("DICTIONARY", len(dict_), "CONFLICTS", len(conflicts))
+
+    ensure_pack()
+    dict_, conflicts, tpl = load_pack()
+    print("DICTIONARY %d  TEMPLATES %d  CONFLICTS %d" % (len(dict_), len(tpl), len(conflicts)))
 
     tag = time.strftime("%Y%m%d-%H%M%S")
-    d = snapshot(tag)
-    print("BACKUP", os.path.relpath(d, ROOT))
+    d = snapshot(tag, before)
+    print("BACKUP %s" % os.path.relpath(d, ROOT))
 
-    before = {f: read(os.path.join(STATIC, f)) for f in FILES}
+    report = []
     try:
-        patchlib.apply_patch(STATIC, dict_, conflicts)
+        patchlib.apply_patch(STATIC, dict_, conflicts, backup_dir=BACKUP, verbose=False,
+                             report=report)
     except SystemExit as e:
-        print("ERROR", e)
-        for f in FILES:
-            write(os.path.join(STATIC, f), before[f])
-        print("ROLLED_BACK")
+        restore_from(before)
+        print("ERROR %s" % e)
+        print("ROLLED_BACK 界面保持原样。")
         return 1
 
-    after = {f: read(os.path.join(STATIC, f)) for f in FILES}
+    # 运行时那一层：</body> 前插入一段带标记的 <script>
+    patched_index = read(os.path.join(STATIC, "index.html"))
+    block = build_block()
+    new_index = inject(patched_index, block)
+    write(os.path.join(STATIC, "index.html"), new_index)
 
-    # --- self check on the real files ------------------------------------
+    # --- 自检 -----------------------------------------------------------
     problems = []
-    if os.path.isfile(NODE):
-        r = subprocess.run([NODE, "--check", os.path.join(STATIC, "app.js")],
+    if strip_patch(new_index) != strip_patch(patched_index):
+        problems.append("去掉标记后与打补丁的 index.html 不一致")
+    if new_index.count(MARK_START) != 1 or new_index.count(MARK_END) != 1:
+        problems.append("标记出现次数不对")
+    if new_index.count("<script") != start_index.count("<script") + 1:
+        problems.append("script 标签数量不对")
+    for tg in ("div", "button", "span", "select", "option", "script", "body", "html"):
+        a = len(re.findall(r"<" + tg + r"\b", start_index))
+        b = len(re.findall(r"<" + tg + r"\b", strip_patch(new_index)))
+        if a != b:
+            problems.append("<%s> 数量变了：%d -> %d" % (tg, a, b))
+    node = find_node()
+    if node:
+        r = subprocess.run([node, "--check", os.path.join(STATIC, "app.js")],
                            capture_output=True, text=True)
         if r.returncode != 0:
-            problems.append("app.js no longer parses:\n" + (r.stderr or "")[:600])
-    for f in ("index.html",):
-        a = patchlib.comparison_literals(before[f])
-        b = patchlib.comparison_literals(after[f])
-        if a != b:
-            problems.append("%s: comparison literals changed: %r" % (f, sorted(a - b)[:5]))
-    a = patchlib.comparison_literals(before["app.js"])
-    b = patchlib.comparison_literals(after["app.js"])
-    if a != b:
-        problems.append("app.js: comparison literals changed: %r" % (sorted(a - b)[:5],))
-
+            problems.append("app.js 解析失败：\n" + (r.stderr or "")[:500])
+    after = {f: read(os.path.join(STATIC, f)) for f in FILES}
     cjk = sum(len([c for c in t if "\u4e00" <= c <= "\u9fff"]) for t in after.values())
-    if cjk < 1000:
-        problems.append("only %d Chinese characters landed - too few" % cjk)
-
+    if cjk < 2000:
+        problems.append("三个文件里的汉字太少（%d）" % cjk)
     if problems:
         for p in problems:
-            print("PROBLEM", p)
-        for f in FILES:
-            write(os.path.join(STATIC, f), before[f])
-        print("ROLLED_BACK")
+            print("PROBLEM %s" % p)
+        restore_from(before)
+        print("ROLLED_BACK 界面保持原样。")
         return 1
 
+    # --- 记录「怎么倒回去」 ----------------------------------------------
+    edits = {f: [] for f in FILES}
+    for r in report:
+        edits[r["file"]].append({"start": r["start"], "end": r["end"],
+                                 "raw": r["raw"], "new": r["new"]})
+    files = {}
+    for f in FILES:
+        files[f] = {"patched_sha256": sha(after[f]),
+                    "pristine_sha256": sha(start_index if f == "index.html" else before[f]),
+                    "edits": edits[f]}
+    write(ROLLBACK, json.dumps({"version": 1, "tag": tag,
+                                "installed_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+                                "files": files}, ensure_ascii=False))
     write(STAMP, json.dumps({"tag": tag, "backup": os.path.relpath(d, ROOT),
-                             "installed_at": time.strftime("%Y-%m-%d %H:%M:%S")},
-                            ensure_ascii=False, indent=1))
+                             "installed_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+                             "entries": len(dict_), "templates": len(tpl),
+                             "occurrences": len(report)}, ensure_ascii=False, indent=1))
+
     print("OK 中文界面已安装")
-    print("CJK_CHARS", cjk)
-    print("GIT_STATUS:")
-    print(git("status", "--porcelain", "--", "src/fizgig/web/static"))
-    print("现在启动 Fizgig（或重启它）即可看到中文界面。")
+    print("PATCHED_OCCURRENCES %d  汉字 %d" % (len(report), cjk))
+    print("还原方式：install.py uninstall（只靠 rollback.json 就能逐字节倒回去）")
+    print("现在重启 Fizgig，或在浏览器里按 Ctrl+F5 强刷，即可看到中文界面。")
     return 0
 
 
+# ---------------------------------------------------------------- 卸载
 def do_uninstall():
-    d = newest_backup()
-    if not d:
-        print("NO_BACKUP 没有找到备份，无法自动卸载。")
-        return 1
-    print("RESTORE_FROM", os.path.relpath(d, ROOT))
-    for f in FILES:
-        p = os.path.join(d, f)
-        if os.path.isfile(p):
-            shutil.copy2(p, os.path.join(STATIC, f))
-            print("RESTORED", f)
-    if os.path.isfile(STAMP):
-        os.remove(STAMP)
-    print("OK 已恢复英文界面")
+    target_path()
+    if reverse_previous():
+        print("OK 已还原英文（按 rollback.json 逐字节倒回，未使用 git）")
+    elif git_restore_pristine():
+        print("OK 已还原英文（git checkout；rollback.json 对不上，可能手动改过）")
+    elif restore_from_backup():
+        print("OK 已还原英文（用备份目录里的原件）")
+    else:
+        p = os.path.join(STATIC, "index.html")
+        raw = read(p)
+        if MARK_START in raw:
+            write(p, strip_patch(raw))
+            print("部分还原：只去掉了注入的 script，app.js / style.css 的改动没能倒回。")
+        else:
+            print("NOT_INSTALLED 没有找到补丁。")
+            return 1
+    for f in (STAMP, ROLLBACK):
+        if os.path.isfile(f):
+            os.remove(f)
     return 0
 
 
 def do_status():
+    target_path()
+    idx = read(os.path.join(STATIC, "index.html"))
+    on = MARK_START in idx
+    cjk = sum(len([c for c in read(os.path.join(STATIC, f)) if "\u4e00" <= c <= "\u9fff"])
+              for f in FILES if os.path.isfile(os.path.join(STATIC, f)))
+    print("PATCHED %s" % ("yes 中文界面已安装" if on else "no 当前是英文界面"))
+    print("FIZGIG_ROOT %s" % ROOT)
+    print("CJK_CHARS %d" % cjk)
+    dict_, conflicts, tpl = load_pack()
+    print("DICTIONARY %d  TEMPLATES %d  CONFLICTS %d" % (len(dict_), len(tpl), len(conflicts)))
     if os.path.isfile(STAMP):
-        s = json.load(io.open(STAMP, encoding="utf-8"))
-        print("INSTALLED", s.get("installed_at"), "backup:", s.get("backup"))
-    else:
-        print("NOT_INSTALLED (没有安装记录)")
-    cjk = 0
-    for f in FILES:
-        p = os.path.join(STATIC, f)
-        if os.path.isfile(p):
-            cjk += len([c for c in read(p) if "\u4e00" <= c <= "\u9fff"])
-    print("CJK_CHARS", cjk)
-    print("GIT_STATUS:")
-    print(git("status", "--porcelain", "--", "src/fizgig/web/static"))
+        print("INSTALLED", json.load(io.open(STAMP, encoding="utf-8")))
+    print("ROLLBACK_RECORD %s" % ("yes 可逐字节还原" if os.path.isfile(ROLLBACK) else "no"))
+    return 0
 
 
 def do_check():
-    dict_ = patchlib.load_dictionary(DICT)
-    conflicts = patchlib.load_conflicts(CONFLICTS)
-    print("DICTIONARY", len(dict_), "CONFLICTS", len(conflicts))
+    target_path()
+    dict_, conflicts, tpl = load_pack()
+    print("DICTIONARY %d  TEMPLATES %d  CONFLICTS %d" % (len(dict_), len(tpl), len(conflicts)))
     total = 0
     for f in FILES:
         p = os.path.join(STATIC, f)
         if not os.path.isfile(p):
             continue
-        occ = patchlib.occurrences_for(f, read(p))
+        src = strip_patch(read(p)) if f == "index.html" else read(p)
+        occ = patchlib.occurrences_for(f, src)
+        value_texts = {o["text"] for o in occ if o["cls"] == "value"}
         disp = {o["text"] for o in occ if o["cls"] == "display"}
-        hit = (disp & set(dict_)) - conflicts
-        print("%-12s display=%-5d translatable=%d" % (f, len(disp), len(hit)))
+        hit = (disp & set(dict_)) - conflicts - value_texts
+        print("%-11s display=%-5d translatable=%d" % (f, len(disp), len(hit)))
         total += len(hit)
-    print("TOTAL_TRANSLATABLE", total)
-    print("备份目录:", BACKUP, "(存在)" if os.path.isdir(BACKUP) else "(还没有)")
+    print("TOTAL_TRANSLATABLE %d" % total)
+    return 0
+
+
+def do_block():
+    sys.stdout.write(build_block())
+    return 0
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("action", nargs="?", default="install",
-                    choices=["install", "uninstall", "status", "check"])
+                    choices=["install", "uninstall", "status", "check", "block"])
     args = ap.parse_args()
-    return {"install": do_install, "uninstall": do_uninstall,
-            "status": do_status, "check": do_check}[args.action]()
+    return {"install": do_install, "uninstall": do_uninstall, "status": do_status,
+            "check": do_check, "block": do_block}[args.action]()
 
 
 if __name__ == "__main__":

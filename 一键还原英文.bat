@@ -34,6 +34,6 @@ if not defined PY (
     exit /b 1
 )
 
-"%PY%" -u "toggle_zh.py" off
+"%PY%" -u "install.py" uninstall
 echo.
 pause

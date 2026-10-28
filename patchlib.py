@@ -145,6 +145,12 @@ DISPLAY_ASSIGN = re.compile(
     r"(?:textContent|innerHTML|innerText|outerHTML|placeholder|title|"
     r"ariaLabel|aria-label)\s*=\s*[^=]$")
 COMPARE = re.compile(r"(?:===|!==|==|!=)\s*$")
+# A literal that is one piece of a "..." + x + "..." chain still reaches the
+# screen when the chain is assigned to a display sink, so look back past the
+# whole statement instead of only at the text right before the quote.
+CHAIN_DISPLAY = re.compile(
+    r"(textContent|innerHTML|innerText|outerHTML|placeholder|title|ariaLabel|"
+    r"aria-label|insertAdjacentHTML)\s*(\+?=)|(?:^|[^\w.])(?:say|toast|hint|flash|note)\s*\(\s*$")
 CASE = re.compile(r"\bcase\s+$")
 KEYLIKE = re.compile(r"[\"']\s*:\s*$")
 
@@ -242,7 +248,10 @@ def js_occurrences(src):
     out = []
     for start, end, quote in js_literal_spans(src):
         raw = src[start:end]
-        before = src[max(0, start - 140):start]
+        # Classify from the *statement* the literal sits in, not a fixed window:
+        # a fixed window drifts with position, so two literals side by side in
+        # one list could be judged differently (and one of them translated).
+        before = src[max(0, start - 600):start].rsplit(";", 1)[-1]
         after = src[end:end + 60]
 
         if quote == "`" and "${" in raw:
@@ -275,6 +284,8 @@ def js_occurrences(src):
         elif DISPLAY_PROP.search(before):
             cls = "display"
         elif DISPLAY_ASSIGN.search(before):
+            cls = "display"
+        elif CHAIN_DISPLAY.search(before.rsplit(";", 1)[-1]):
             cls = "display"
         else:
             cls = "unknown"
@@ -311,7 +322,7 @@ def comparison_literals(src):
 
 
 def load_dictionary(path):
-    with io.open(path, encoding="utf-8") as f:
+    with io.open(path, encoding="utf-8", newline="") as f:
         data = json.load(f)
     return {k: v for k, v in data.items() if isinstance(v, str) and v.strip()}
 
@@ -319,7 +330,7 @@ def load_dictionary(path):
 def load_conflicts(path):
     if not os.path.isfile(path):
         return set()
-    with io.open(path, encoding="utf-8") as f:
+    with io.open(path, encoding="utf-8", newline="") as f:
         return set(json.load(f))
 
 
@@ -361,16 +372,20 @@ def looks_like_code(t):
 
 
 def digits_of(s):
-    return re.findall(r"\d+", s)
+    # order-insensitive: Chinese often puts the number in a different place
+    return sorted(re.findall(r"\d+", s))
 
 
 def patch_source(name, src, dictionary, conflicts, report):
     occ = occurrences_for(name, src)
+    # Anything the code also compares / uses as a key keeps its English: the two
+    # would otherwise disagree (the caller may add to this via conflicts.json).
+    value_texts = {o["text"] for o in occ if o["cls"] == "value"}
     edits = []
     for o in occ:
         if o["cls"] != "display":
             continue
-        if o["text"] in conflicts:       # display in one place, value in another
+        if o["text"] in conflicts or o["text"] in value_texts:
             continue
         if looks_like_code(o["text"]):
             continue
@@ -397,21 +412,23 @@ def patch_source(name, src, dictionary, conflicts, report):
             new = new.replace("\\", "\\\\").replace(quote, "\\" + quote)
             new = new.replace("\n", "\\n")
         out = out[:o["start"]] + new + out[o["end"]:]
-        report.append((name, o["text"], zh))
+        report.append({"file": name, "start": o["start"], "end": o["end"],
+                       "raw": raw, "new": new, "text": o["text"], "zh": zh})
     return out
 
 
-def apply_patch(static_dir, dictionary, conflicts, backup_dir=BACKUP_DIR, verbose=True):
+def apply_patch(static_dir, dictionary, conflicts, backup_dir=BACKUP_DIR, verbose=True, report=None):
     if not os.path.isdir(static_dir):
         raise SystemExit("static dir not found: %s" % static_dir)
     os.makedirs(backup_dir, exist_ok=True)
-    report = []
+    if report is None:
+        report = []
     before_cmp, after_cmp = {}, {}
     for name in FILES:
         path = os.path.join(static_dir, name)
         if not os.path.isfile(path):
             continue
-        src = io.open(path, encoding="utf-8").read()
+        src = io.open(path, encoding="utf-8", newline="").read()
         before_cmp[name] = comparison_literals(src)
         bak = os.path.join(backup_dir, name + ".orig")
         if not os.path.isfile(bak):
@@ -428,8 +445,28 @@ def apply_patch(static_dir, dictionary, conflicts, backup_dir=BACKUP_DIR, verbos
                              % (name, sorted(missing)[:10]))
     if verbose:
         print("PATCHED_OCCURRENCES", len(report))
-        print("UNIQUE_STRINGS_TRANSLATED", len({t for _, t, _ in report}))
+        print("UNIQUE_STRINGS_TRANSLATED", len({r["text"] for r in report}))
     return report
+
+
+def reverse_edits(src, edits):
+    """Undo a recorded edit list.
+
+    Offsets are original ones. Walk forwards: putting each earlier edit back
+    byte for byte restores the original layout, so the next edit really is at
+    its recorded position.
+    """
+    out = src
+    problems = []
+    for e in sorted(edits, key=lambda x: x["start"]):
+        s = e["start"]
+        if out[s:s + len(e["new"])] != e["new"]:
+            problems.append(s)
+            continue
+        out = out[:s] + e["raw"] + out[s + len(e["new"]):]
+    if problems:
+        raise SystemExit("REVERSE FAILED at offsets %r" % problems[:5])
+    return out
 
 
 def revert(static_dir, backup_dir=BACKUP_DIR):
@@ -470,7 +507,7 @@ def main():
             path = os.path.join(args.static_dir, name)
             if not os.path.isfile(path):
                 continue
-            src = io.open(path, encoding="utf-8").read()
+            src = io.open(path, encoding="utf-8", newline="").read()
             occ = occurrences_for(name, src)
             disp = {o["text"] for o in occ if o["cls"] == "display"}
             hit = disp & set(dictionary) - conflicts

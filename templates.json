@@ -1,0 +1,238 @@
+[
+ [
+  "Switched to \u0000 to match the checkpoints.",
+  "已切换到 \u0000 以匹配检查点。"
+ ],
+ [
+  "Delete the curve preset '\u0000'?",
+  "删除曲线预设“\u0000”？"
+ ],
+ [
+  "Replace the curve preset '\u0000'?",
+  "替换曲线预设“\u0000”？"
+ ],
+ [
+  "Replace the setup '\u0000'?",
+  "替换 setup“\u0000”？"
+ ],
+ [
+  "Save the changes into \u0000?",
+  "把改动保存到 \u0000？"
+ ],
+ [
+  "Clear \u0000 queued run\u0000?",
+  "清空 \u0000 个排队运行\u0000？"
+ ],
+ [
+  "Page \u0000 of \u0000 · \u0000 pictures · \u0000 marked",
+  "第 \u0000 / \u0000 页 · \u0000 张图片 · 已标记 \u0000 张"
+ ],
+ [
+  "Previews \u0000 steps, CFG \u0000",
+  "预览 \u0000 步，CFG \u0000"
+ ],
+ [
+  "Baseline (LoRA at \u0000)",
+  "基准（LoRA 强度 \u0000）"
+ ],
+ [
+  "Download SAM 3.1 (\u0000 GB)",
+  "下载 SAM 3.1（\u0000 GB）"
+ ],
+ [
+  "Downloading SAM 3.1: \u0000 of \u0000 GB …",
+  "正在下载 SAM 3.1：\u0000 / \u0000 GB ……"
+ ],
+ [
+  "Scoring faces… \u0000/\u0000",
+  "正在评分人脸…… \u0000/\u0000"
+ ],
+ [
+  "every \u0000 epochs",
+  "每 \u0000 轮"
+ ],
+ [
+  "Added to the queue as number \u0000",
+  "已加入队列，序号 \u0000"
+ ],
+ [
+  "Saved: queued run \u0000 has these settings now.",
+  "已保存：排队运行 \u0000 现在使用这些设置。"
+ ],
+ [
+  "Setup loaded: \u0000.",
+  "已加载 setup：\u0000。"
+ ],
+ [
+  "Setup saved: \u0000.",
+  "已保存 setup：\u0000。"
+ ],
+ [
+  "Captions written for \u0000 photos.",
+  "已为 \u0000 张图片写入描述。"
+ ],
+ [
+  "Fizgig moves to port \u0000 next time it starts (this page is on \u0000 until then).",
+  "Fizgig 下次启动会改到端口 \u0000（在此之前本页面仍在 \u0000 上）。"
+ ],
+ [
+  "Recording: \u0000 s left…",
+  "录音中：还剩 \u0000 秒……"
+ ],
+ [
+  "Stopping this pod in \u0000 s so it stops billing.",
+  "\u0000 秒后停止这个 pod，以结束计费。"
+ ],
+ [
+  "Uploading \u0000: \u0000 of \u0000 MB",
+  "正在上传 \u0000：\u0000 / \u0000 MB"
+ ],
+ [
+  "Uploading \u0000 file\u0000: \u0000 done, \u0000 going",
+  "正在上传 \u0000 个文件\u0000：已完成 \u0000，进行中 \u0000"
+ ],
+ [
+  "Saved \u0000 (\u0000 frames). LoRA Royale saves MP4 and GIF.",
+  "已保存 \u0000（\u0000 帧）。LoRA Royale 保存 MP4 和 GIF。"
+ ],
+ [
+  "Saved \u0000 stills → \u0000",
+  "已保存 \u0000 张静帧 → \u0000"
+ ],
+ [
+  "Saved \u0000 frames → \u0000",
+  "已保存 \u0000 帧 → \u0000"
+ ],
+ [
+  "Training on \u0000",
+  "正在用 \u0000 训练"
+ ],
+ [
+  "This GPU is helping \u0000",
+  "这块 GPU 正在帮助 \u0000"
+ ],
+ [
+  "Busy helping \u0000",
+  "正忙于帮助 \u0000"
+ ],
+ [
+  "Editing queued run \u0000",
+  "正在编辑排队运行 \u0000"
+ ],
+ [
+  "Load the \u0000 LoRA first, then \u0000.",
+  "请先加载 \u0000 LoRA，然后再 \u0000。"
+ ],
+ [
+  "Models for \u0000:",
+  "\u0000 的模型："
+ ],
+ [
+  "Download the previews (\u0000 files, \u0000, .zip)",
+  "下载这些预览（\u0000 个文件，\u0000，.zip）"
+ ],
+ [
+  "Download the previews (\u0000 files, \u0000, \u0000)",
+  "下载这些预览（\u0000 个文件，\u0000，\u0000）"
+ ],
+ [
+  "Moved \u0000 picture(s) to \u0000. \u0000 remain in the dataset.",
+  "已将 \u0000 张图片移至 \u0000。数据集中还剩 \u0000 张。"
+ ],
+ [
+  "Move \u0000 picture(s), with their captions, out of the dataset to",
+  "把 \u0000 张图片及其描述移出数据集，移至"
+ ],
+ [
+  "Nothing saved by \u0000 yet: checkpoints appear here as the run saves them.",
+  "NaN 还没有保存任何内容：运行保存时检查点会出现在这里。"
+ ],
+ [
+  "Continuing \u0000: it's on the Training tab.",
+  "继续 \u0000：它在 Training 标签页。"
+ ],
+ [
+  "On \u0000: its login ran out, so this computer can't see it. Add it again on the Helpers tab.",
+  "在 \u0000 上：它的登录过期了，所以这台电脑看不到它。请在 Helpers 标签页重新添加。"
+ ],
+ [
+  "Only one epoch of the \u0000's run is beside its file, so there is nothing to blend.",
+  "\u0000 那次运行只有一轮在它的文件旁，所以没有可混合的内容。"
+ ],
+ [
+  "Opened the ReFLoRA \u0000 - press Render.",
+  "已打开 ReFLoRA \u0000 - 请按 Render。"
+ ],
+ [
+  "Finished on \u0000.",
+  "已在 \u0000 上完成。"
+ ],
+ [
+  "Paused on \u0000.",
+  "已在 \u0000 上暂停。"
+ ],
+ [
+  "Trained on \u0000",
+  "在 \u0000 上训练"
+ ],
+ [
+  "Training its own run (\u0000).",
+  "正在训练它自己的运行（\u0000）。"
+ ],
+ [
+  "Training its share of epoch \u0000",
+  "正在分担第 \u0000 轮的训练"
+ ],
+ [
+  "Uploaded to \u0000",
+  "已上传到 \u0000"
+ ],
+ [
+  "Use it at strength \u0000.",
+  "以强度 \u0000 使用它。"
+ ],
+ [
+  "Extracting to \u0000…",
+  "正在提取到 \u0000……"
+ ],
+ [
+  "Fetching \u0000: \u0000 of \u0000",
+  "正在获取 \u0000：\u0000 / \u0000"
+ ],
+ [
+  "Curve preset '\u0000' saved.",
+  "曲线预设“\u0000”已保存。"
+ ],
+ [
+  "Strip saved: \u0000",
+  "已保存 strip：\u0000"
+ ],
+ [
+  "Lucky mix: \u0000 slider(s) rolled, \u0000 to \u0000",
+  "Lucky 混合：掷出 \u0000 个滑块，从 \u0000 到 \u0000"
+ ],
+ [
+  "Look match changed to \u0000, so characters' faces get scored too.",
+  "Look match 已改为 \u0000，所以角色的脸也会参与评分。"
+ ],
+ [
+  "Look match: \u0000 (scores are on its own scale)",
+  "Look match：\u0000（分数按它自己的尺度）"
+ ],
+ [
+  "You're on \u0000. \u0000",
+  "你正在使用 \u0000。\u0000"
+ ],
+ [
+  "Delete the setup '\u0000'?",
+  "删除 setup“\u0000”？"
+ ],
+ [
+  "Curve preset '\u0000' deleted.",
+  "曲线预设“\u0000”已删除。"
+ ],
+ [
+  "Setup deleted: \u0000",
+  "已删除 setup：\u0000"
+ ]
+]
