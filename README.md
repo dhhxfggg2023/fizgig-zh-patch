@@ -152,7 +152,7 @@ src/fizgig/web/static/style.css
 | `build_pack.py` | 把词表编译成 `zh_pack.js` |
 | `zh_runtime.js` | 运行时翻译器（DOM / 弹窗 / 下拉选项） |
 | `zh_pack.js` | 编译产物：`window.FIZGIG_ZH = {exact, templates, skip}`（**由 build_pack.py 生成，别手改**） |
-| `dictionary.json` | **词条表**：英文 → 中文（当前 3868 条） |
+| `dictionary.json` | **词条表**：英文 → 中文（当前 3931 条） |
 | `templates.json` | 带变量的句子模板（`\u0000` 是变量占位） |
 | `skip.json` | 永远不翻的词（代码要读回去比较的） |
 | `rollback.json` | **还原记录**：改了哪几个字节、原文是什么（本地状态，不入库） |

@@ -53,15 +53,25 @@
     return out.join("\n");
   }
 
+  /* Whitespace inside a text node is layout: a hint that wraps over two source
+     lines arrives as "...and a\n  driver..." while the dictionary stores it on
+     one line. Try the collapsed form before giving up. */
+  function collapsed(s) { return s.replace(/\s+/g, " ").trim(); }
+
   function lookup(plain) {
     var hit = EXACT[plain];
     if (hit !== undefined) return hit;
+    var flat = collapsed(plain);
+    if (flat !== plain) {
+      hit = EXACT[flat];
+      if (hit !== undefined) return hit;
+    }
     if (SKIP[plain]) return null;
     if (!TEMPLATES.length || plain.length > MAXLEN) return null;
     for (var i = 0; i < TEMPLATES.length; i++) {
       var t = TEMPLATES[i];
-      if (t.first && plain.indexOf(t.first) !== 0) continue;
-      var m = t.re.exec(plain);
+      if (t.first && plain.indexOf(t.first) !== 0 && flat.indexOf(t.first) !== 0) continue;
+      var m = t.re.exec(plain) || (flat !== plain ? t.re.exec(flat) : null);
       if (m) return applyTpl(t, m);
     }
     return null;
