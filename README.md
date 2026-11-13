@@ -7,7 +7,9 @@
 > 词表由 AI（DeepSeek 等大模型）按 `TRANSLATE_RULES.md` 批量翻译，**未经母语者逐条校对**。
 > 个别用词可能不够地道。觉得哪里别扭，直接改 `dictionary.json` 里那一条再重新安装即可。
 
-**适配版本：Fizgig v8.9.93（2026-10-28，commit 98de7a48）**
+**适配版本：Fizgig v9.6.1（2026-11-13，commit f7c8d48f）**
+
+**下载**：不想用 git 的话，下载 [`fizgig-zh-patch-v9.6.1.zip`](fizgig-zh-patch-v9.6.1.zip)，解压后把 `zh_patch` 文件夹放进 Fizgig 根目录即可。
 
 ---
 
@@ -142,6 +144,7 @@ src/fizgig/web/static/style.css
 |---|---|
 | **`一键汉化.bat`** / **`一键还原英文.bat`** | 双击切换中英文 |
 | **`一键更新并汉化.bat`** | 更新 Fizgig 后再汉化（推荐用它更新） |
+| **`fizgig-zh-patch-v9.6.1.zip`** | 打包好的下载包（内容与仓库相同，解压即用） |
 | `install.py` | 安装 / 卸载 / 状态 / 体检 |
 | `update_zh.py` | 更新流程（还原 → 官方更新 → 重新汉化） |
 | `toggle_zh.py` | `一键汉化.bat` 背后调用的切换脚本 |
@@ -149,7 +152,7 @@ src/fizgig/web/static/style.css
 | `build_pack.py` | 把词表编译成 `zh_pack.js` |
 | `zh_runtime.js` | 运行时翻译器（DOM / 弹窗 / 下拉选项） |
 | `zh_pack.js` | 编译产物：`window.FIZGIG_ZH = {exact, templates, skip}`（**由 build_pack.py 生成，别手改**） |
-| `dictionary.json` | **词条表**：英文 → 中文（当前 2182 条） |
+| `dictionary.json` | **词条表**：英文 → 中文（当前 3868 条） |
 | `templates.json` | 带变量的句子模板（`\u0000` 是变量占位） |
 | `skip.json` | 永远不翻的词（代码要读回去比较的） |
 | `rollback.json` | **还原记录**：改了哪几个字节、原文是什么（本地状态，不入库） |

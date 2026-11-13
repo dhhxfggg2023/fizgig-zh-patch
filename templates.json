@@ -234,5 +234,625 @@
  [
   "Setup deleted: \u0000",
   "已删除 setup：\u0000"
+ ],
+ [
+  "\u0000 (\u0000 steps to undo, \u0000 to redo).",
+  "\u0000（\u0000 步可撤销，\u0000 可重做）。"
+ ],
+ [
+  "\u0000 (from different subfolders); they all go into one folder, so the last one is kept.",
+  "\u0000（来自不同子文件夹）；它们都会进入同一个文件夹，所以只保留最后一个。"
+ ],
+ [
+  "\u0000 - from this model's Samples tab.",
+  "\u0000 — 来自这个模型的样本标签页。"
+ ],
+ [
+  "\u0000 GB free",
+  "\u0000 GB 可用"
+ ],
+ [
+  "\u0000 LoRA: load it as the primary and set this to 0.",
+  "\u0000 LoRA：把它作为主体加载，并将此项设为 0。"
+ ],
+ [
+  "\u0000 MP for the first \u0000",
+  "前 \u0000 张用 \u0000 MP"
+ ],
+ [
+  "\u0000 TB free",
+  "\u0000 TB 可用"
+ ],
+ [
+  "\u0000 and \u0000). A preview there looks as much like the person as a real photo does -",
+  "\u0000 和 \u0000）。那里的预览看起来就像真实照片一样像本人 —"
+ ],
+ [
+  "\u0000 at 0 (the base model alone) it needs \u0000.",
+  "\u0000 在 0 时（只用基础模型）需要 \u0000。"
+ ],
+ [
+  "\u0000 captions would change:",
+  "\u0000 条描述会改变："
+ ],
+ [
+  "\u0000 cost more than your limit",
+  "\u0000 的费用超出你的上限"
+ ],
+ [
+  "\u0000 didn't start: RunPod still has it stopped. Often no GPU is free on its machine now; its page on RunPod says why.",
+  "\u0000 没有启动：RunPod 上它仍是停止状态。通常是它的机器上现在没有空闲 GPU；它在 RunPod 上的页面会说明原因。"
+ ],
+ [
+  "\u0000 face\u0000 found (\u0000):",
+  "找到 \u0000 张脸\u0000（\u0000）："
+ ],
+ [
+  "\u0000 file\u0000 uploaded",
+  "已上传 \u0000 个文件\u0000"
+ ],
+ [
+  "\u0000 files · \u0000 removed",
+  "\u0000 个文件 · 已移除 \u0000 个"
+ ],
+ [
+  "\u0000 has no Studio settings in it (Download tweaked saves them).",
+  "\u0000 里没有 Studio 设置（「下载调整后」会保存它们）。"
+ ],
+ [
+  "\u0000 hasn't \u0000 yet: check it on RunPod.",
+  "\u0000 还没有 \u0000：在 RunPod 上查看。"
+ ],
+ [
+  "\u0000 hasn't saved a checkpoint yet.",
+  "\u0000 还没有保存 checkpoint。"
+ ],
+ [
+  "\u0000 images · \u0000 epochs",
+  "\u0000 张图片 · \u0000 个轮次"
+ ],
+ [
+  "\u0000 is being deleted on RunPod.",
+  "\u0000 正在 RunPod 上被删除。"
+ ],
+ [
+  "\u0000 is loaded, ready.",
+  "\u0000 已加载，就绪。"
+ ],
+ [
+  "\u0000 is stopping. Its files stay on its volume for next time.",
+  "\u0000 正在停止。它的文件会留在卷上供下次使用。"
+ ],
+ [
+  "\u0000 is the Model EQ: 1.0 = the stock model, 0 / 2 = -\u0000% / +\u0000% of each block's main directions.",
+  "\u0000 是模型均衡：1.0 = 原版模型，0 / 2 = 每个块主要方向的 -\u0000% / +\u0000%。"
+ ],
+ [
+  "\u0000 is the primary LoRA.",
+  "\u0000 是主体 LoRA。"
+ ],
+ [
+  "\u0000 more card\u0000 none free right now",
+  "\u0000 更多卡\u0000 现在没有空闲"
+ ],
+ [
+  "\u0000 moved here from this computer, so its move handles it: on the run card, its checkpoints and",
+  "\u0000 是从这台电脑移过来的，所以由它的移动来处理：在运行卡片上，它的 checkpoint 和"
+ ],
+ [
+  "\u0000 moved to removed (Undo is on its card).",
+  "\u0000 已移入已移除（撤销在它的卡片上）。"
+ ],
+ [
+  "\u0000 moved to removed.",
+  "\u0000 已移入已移除。"
+ ],
+ [
+  "\u0000 ms away",
+  "延迟 \u0000 毫秒"
+ ],
+ [
+  "\u0000 needs: \u0000. Set them on the Preferences tab.",
+  "\u0000 需要：\u0000。在偏好设置标签页里设置。"
+ ],
+ [
+  "\u0000 of \u0000 captioned",
+  "已描述 \u0000 / \u0000"
+ ],
+ [
+  "\u0000 of \u0000 pictures have a mask.",
+  "\u0000 / \u0000 张图片有掩码。"
+ ],
+ [
+  "\u0000 of \u0000 sliders free to roll",
+  "\u0000 / \u0000 个滑块可自由滚动"
+ ],
+ [
+  "\u0000 of 3 chosen",
+  "已选 \u0000 / 3"
+ ],
+ [
+  "\u0000 of the \u0000 photos already have a",
+  "\u0000 张照片中已有 \u0000 张带有"
+ ],
+ [
+  "\u0000 preview\u0000 of \u0000 in \u0000",
+  "\u0000 预览\u0000 \u0000 中的 \u0000"
+ ],
+ [
+  "\u0000 reads as \u0000",
+  "\u0000 读作 \u0000"
+ ],
+ [
+  "\u0000 run\u0000 in \u0000",
+  "\u0000 运行\u0000 共 \u0000"
+ ],
+ [
+  "\u0000 saved by \u0000 in \u0000, newest first.",
+  "\u0000 由 \u0000 保存在 \u0000，最新的在前。"
+ ],
+ [
+  "\u0000 songs captioned \"\u0000\", \u0000 kept.",
+  "已为 \u0000 首歌曲写描述 \"\u0000\"，保留 \u0000 首。"
+ ],
+ [
+  "\u0000 steps on the \u0000's own schedule, no CFG.",
+  "\u0000 步，按 \u0000 自己的计划，无 CFG。"
+ ],
+ [
+  "\u0000 steps on the base model, CFG \u0000 with the Negative.",
+  "\u0000 步，在基础模型上，CFG \u0000，使用负向提示。"
+ ],
+ [
+  "\u0000 steps on the model's standard schedule, no CFG - the \u0000 is tuned for \u0000 steps on its own",
+  "\u0000 步，按模型的标准计划，无 CFG — \u0000 是针对它自己的 \u0000 步调好的"
+ ],
+ [
+  "\u0000 steps · lowest smoothed loss \u0000 at step",
+  "\u0000 步 · 最低平滑损失 \u0000，在第"
+ ],
+ [
+  "\u0000 steps, CFG \u0000 - from this model's Samples tab.",
+  "\u0000 步，CFG \u0000 — 来自这个模型的样本标签页。"
+ ],
+ [
+  "\u0000 written, \u0000 kept.",
+  "已写入 \u0000 条，保留 \u0000 条。"
+ ],
+ [
+  "\u0000 · last saved \u0000",
+  "\u0000 · 最后保存 \u0000"
+ ],
+ [
+  "\u0000 · nothing found",
+  "\u0000 · 未找到任何内容"
+ ],
+ [
+  "\u0000 · profiled \u0000 · most active blocks:",
+  "\u0000 · 已分析 \u0000 · 最活跃的块："
+ ],
+ [
+  "\u0000% sent). Upload again to carry on from there.",
+  "\u0000% 已发送）。再次上传即可从那里继续。"
+ ],
+ [
+  "\u0000. Rename them (no leading dot, no slashes) and upload them again.",
+  "\u0000。把它们重命名（不要以点开头，不要有斜杠）再上传一次。"
+ ],
+ [
+  "\u0000: to caption or mask one, choose it as the training folder on the Start tab.",
+  "\u0000：要为它写描述或做掩码，请在开始标签页把它选为训练文件夹。"
+ ],
+ [
+  "\u0000: white trains fully, black only as much as the Training tab's Masked training card says.",
+  "\u0000：白色完全训练，黑色只按训练标签页里「掩码训练」卡片说的那么多。"
+ ],
+ [
+  "\u0000excluded_by_look? Nothing is deleted: move them back to put them in again.",
+  "\u0000excluded_by_look？什么都不会删除：把它们移回去就能重新加入。"
+ ],
+ [
+  "\u0000previews for epoch \u0000",
+  "\u0000轮次 \u0000 的预览"
+ ],
+ [
+  "\"\u0000\" is there already.",
+  "\"\u0000\" 已经在那里了。"
+ ],
+ [
+  "\"\u0000\" isn't in the prompt (or this model has no trigger map).",
+  "\"\u0000\" 不在提示词里（或这个模型没有触发词映射）。"
+ ],
+ [
+  "+ \u0000 in \u0000 sub-folder",
+  "+ \u0000 在 \u0000 子文件夹里"
+ ],
+ [
+  "A shortcut: the folders in \u0000, and the ones you've picked from",
+  "一个快捷方式：\u0000 里的文件夹，以及你从中挑选过的"
+ ],
+ [
+  "Adaptive LR \u0000 to \u0000",
+  "自适应学习率 \u0000 到 \u0000"
+ ],
+ [
+  "Added to \u0000 captions.",
+  "已添加到 \u0000 条描述。"
+ ],
+ [
+  "All \u0000 saved in \u0000, newest first.",
+  "\u0000 全部保存在 \u0000，最新的在前。"
+ ],
+ [
+  "Another Fizgig version there. \u0000",
+  "那边的 Fizgig 版本不同。\u0000"
+ ],
+ [
+  "At \u0000 the \u0000 is part-way to the base model, which is meant to run with CFG - untested.",
+  "在 \u0000 时，\u0000 只是部分走向基础模型，它本来是要用 CFG 运行的 — 未经测试。"
+ ],
+ [
+  "Big files in and out, by drag and drop. \u0000.",
+  "大文件进出都用拖放。\u0000。"
+ ],
+ [
+  "Blank: Fdetailer if it's saved as \u0000, otherwise a free anime head",
+  "留空：如果保存为 \u0000 就用 Fdetailer，否则用一个免费的动漫头像"
+ ],
+ [
+  "Captioning \u0000 of \u0000",
+  "正在描述 \u0000 / \u0000"
+ ],
+ [
+  "Checked with \u0000.",
+  "用 \u0000 检查过。"
+ ],
+ [
+  "Checks how a trigger word reads to \u0000's text encoder, the one this LoRA trains with, before you",
+  "在你开始之前，检查触发词在 \u0000 的文本编码器（这个 LoRA 训练时用的那个）里怎么读"
+ ],
+ [
+  "Coming home as they're saved: \u0000.",
+  "保存时自动回到这里：\u0000。"
+ ],
+ [
+  "Delete the set \u0000?",
+  "删除集合 \u0000？"
+ ],
+ [
+  "Downloading… \u0000 of \u0000 GB",
+  "正在下载… \u0000 / \u0000 GB"
+ ],
+ [
+  "Editing queued run \u0000 (\u0000): change what you like, then Save to queue.",
+  "正在编辑已排队的运行 \u0000（\u0000）：随意修改，然后保存到队列。"
+ ],
+ [
+  "Face likeness \u0000% \u0000 \u0000%",
+  "脸部相似度 \u0000% \u0000 \u0000%"
+ ],
+ [
+  "Fade from \u0000: \u0000 / \u0000 / \u0000.",
+  "从 \u0000 淡出：\u0000 / \u0000 / \u0000。"
+ ],
+ [
+  "Fetches every file above (~\u0000 GB) and fills in these paths, plus the Qwen3-VL captioner",
+  "获取上面每个文件（约 \u0000 GB）并填好这些路径，以及 Qwen3-VL 描述器"
+ ],
+ [
+  "For a \u0000 that won't come back (a pod deleted): carries on here from this computer's last save -",
+  "对于不会再回来的 \u0000（比如已删除的 pod）：从这台电脑上次保存的地方继续 —"
+ ],
+ [
+  "It \u0000 on \u0000",
+  "它在 \u0000 上 \u0000"
+ ],
+ [
+  "It goes into \u0000, in a folder with the name above.",
+  "它会放进 \u0000，文件夹名就是上面那个名字。"
+ ],
+ [
+  "It has trained all \u0000 \u0000s.",
+  "它已经训练完所有 \u0000 个 \u0000。"
+ ],
+ [
+  "Key saved. \u0000 Fizgig pod\u0000 on your account.",
+  "密钥已保存。你账户上有 \u0000 个 Fizgig pod\u0000。"
+ ],
+ [
+  "Left out \u0000 video file\u0000 Fizgig can't",
+  "已排除 \u0000 个视频文件\u0000 Fizgig 无法"
+ ],
+ [
+  "Left out (not pictures, clips, songs or captions): \u0000.",
+  "已排除（不是图片、片段、歌曲或描述）：\u0000。"
+ ],
+ [
+  "LoRAs save to \u0000",
+  "LoRA 保存到 \u0000"
+ ],
+ [
+  "Loaded \u0000: \u0000 prompt(s).",
+  "已加载 \u0000：\u0000 条提示词。"
+ ],
+ [
+  "Loaded - \u0000 metadata key\u0000 found.",
+  "已加载 — 找到 \u0000 个元数据键\u0000。"
+ ],
+ [
+  "Loaded the settings of \u0000: check them, then Start.",
+  "已加载 \u0000 的设置：检查一下，然后开始。"
+ ],
+ [
+  "More than \u0000, please.",
+  "请大于 \u0000。"
+ ],
+ [
+  "More than one file is named \u0000",
+  "有多个文件都叫 \u0000"
+ ],
+ [
+  "No pictures in \u0000 folder.",
+  "\u0000 文件夹里没有图片。"
+ ],
+ [
+  "No training folders on this computer yet (\u0000).",
+  "这台电脑上还没有训练文件夹（\u0000）。"
+ ],
+ [
+  "Not added: \u0000 is a LoRA for \u0000.",
+  "未添加：\u0000 是给 \u0000 的 LoRA。"
+ ],
+ [
+  "Not for this run: \u0000 trains one picture a step.",
+  "不适用于这次运行：\u0000 每步只训练一张图片。"
+ ],
+ [
+  "Only \u0000: does it land on its own subject?",
+  "只有 \u0000：它会落在自己的主体上吗？"
+ ],
+ [
+  "Open the \u0000 tab",
+  "打开 \u0000 标签页"
+ ],
+ [
+  "Pick your volume on RunPod's page too: it's in \u0000.",
+  "也要在 RunPod 的页面上选择卷：它在 \u0000 里。"
+ ],
+ [
+  "Previews couldn't refresh: \u0000. Press F5 to reload the page.",
+  "预览无法刷新：\u0000。按 F5 重新加载页面。"
+ ],
+ [
+  "Previews render on \u0000: \u0000, no Turbo LoRA.",
+  "预览在 \u0000 上渲染：\u0000，不用 Turbo LoRA。"
+ ],
+ [
+  "Primary + donor, 50/50: \u0000 block(s) at 0.5 each, \u0000 touched by one LoRA",
+  "主体 + 供体，50/50：\u0000 个块各占 0.5，\u0000 个只被一个 LoRA 涉及"
+ ],
+ [
+  "Qwen3-VL captions with your secondary captioning model (\u0000, set in Preferences), following an",
+  "Qwen3-VL 用你的次级描述模型（\u0000，在偏好设置里设置）来写描述，遵循一个"
+ ],
+ [
+  "Replaced in \u0000 captions.",
+  "已替换 \u0000 条描述。"
+ ],
+ [
+  "RunPod's deploy page with \u0000 and Fizgig's template chosen",
+  "RunPod 的部署页面，已选好 \u0000 和 Fizgig 模板"
+ ],
+ [
+  "SVD: \u0000 of \u0000 layers…",
+  "SVD：\u0000 / \u0000 层…"
+ ],
+ [
+  "SVD: layer \u0000 of \u0000…",
+  "SVD：第 \u0000 / \u0000 层…"
+ ],
+ [
+  "Sampling steps for the clip. With \u0000 at \u0000, \u0000 steps is the fast loop; with",
+  "短片的采样步数。当 \u0000 为 \u0000 时，\u0000 步是快速循环；当"
+ ],
+ [
+  "Saved \u0000 LoRAs in \u0000",
+  "已保存 \u0000 个 LoRA 到 \u0000"
+ ],
+ [
+  "Saved \u0000-masklabel.png.",
+  "已保存 \u0000-masklabel.png。"
+ ],
+ [
+  "Saved \u0000: every model's Samples tab can load it.",
+  "已保存 \u0000：每个模型的样本标签页都能加载它。"
+ ],
+ [
+  "Saved at \u0000 \u0000",
+  "保存在 \u0000 \u0000"
+ ],
+ [
+  "Saved the preset \u0000: it's in both apps' preset list for this model.",
+  "已保存预设 \u0000：它在两个应用里这个模型的预设列表中。"
+ ],
+ [
+  "Scan it now: it hides in \u0000 s. Each code works once.",
+  "现在扫描：它藏在 \u0000 秒里。每个码只能用一次。"
+ ],
+ [
+  "Send to \u0000",
+  "发送到 \u0000"
+ ],
+ [
+  "Set by --port where Fizgig was started (\u0000). Change it there.",
+  "由启动 Fizgig 时的 --port 设置（\u0000）。要在那里改。"
+ ],
+ [
+  "Show \u0000 earlier checkpoint",
+  "显示前 \u0000 个 checkpoint"
+ ],
+ [
+  "Show all \u0000",
+  "显示全部 \u0000"
+ ],
+ [
+  "Show the \u0000 from other runs in this folder",
+  "显示这个文件夹里其他运行的 \u0000"
+ ],
+ [
+  "Starting \u0000: it opens here when it's ready. A pod can take a few minutes to start; if it isn't",
+  "正在启动 \u0000：就绪后它会在这里打开。pod 可能需要几分钟才能启动；如果还没有"
+ ],
+ [
+  "Step \u0000 · epoch \u0000 · loss \u0000",
+  "步 \u0000 · 轮次 \u0000 · 损失 \u0000"
+ ],
+ [
+  "Strength of the built-in \u0000 LoRA: \u0000 for the fast previews. 0 switches it off - the",
+  "内置 \u0000 LoRA 的强度：快速预览用 \u0000。0 表示关闭 — 那个"
+ ],
+ [
+  "The form's size differs from the run's (\u0000). Resume:",
+  "表单的尺寸和这次运行的不同（\u0000）。继续："
+ ],
+ [
+  "There's a preset called \u0000 already.",
+  "已经有叫 \u0000 的预设了。"
+ ],
+ [
+  "There's a set called \u0000 already.",
+  "已经有叫 \u0000 的集合了。"
+ ],
+ [
+  "Training on \u0000 (it isn't answering just now).",
+  "正在 \u0000 上训练（它现在没有响应）。"
+ ],
+ [
+  "Training on these since epoch \u0000.",
+  "从轮次 \u0000 起在这些上面训练。"
+ ],
+ [
+  "Translating \u0000 of \u0000",
+  "正在翻译 \u0000 / \u0000"
+ ],
+ [
+  "What Qwen3-VL is told for \"\u0000\"",
+  "Qwen3-VL 对 \"\u0000\" 被告知的内容"
+ ],
+ [
+  "Where \u0000 acts",
+  "\u0000 在哪里起作用"
+ ],
+ [
+  "Windows calls \u0000 a Public network and lets no",
+  "Windows 把 \u0000 当作公用网络，不允许任何"
+ ],
+ [
+  "With this face finder that means \u0000.",
+  "用这个脸部查找器，这意味着 \u0000。"
+ ],
+ [
+  "Your \u0000 training photos score \u0000 against the 3 reference photos (most between",
+  "你的 \u0000 训练照片与 3 张参考照片的打分是 \u0000（大多在"
+ ],
+ [
+  "about \u0000 h \u0000 min",
+  "约 \u0000 小时 \u0000 分"
+ ],
+ [
+  "about \u0000 min",
+  "约 \u0000 分钟"
+ ],
+ [
+  "about \u0000× a 5090's speed",
+  "约为 5090 速度的 \u0000 倍"
+ ],
+ [
+  "around epoch \u0000 - compare a few epochs either side.",
+  "大约在轮次 \u0000 — 对比前后几个轮次。"
+ ],
+ [
+  "block swap \u0000",
+  "块交换 \u0000"
+ ],
+ [
+  "caption dropout \u0000",
+  "描述丢弃率 \u0000"
+ ],
+ [
+  "caption fixed at epoch \u0000",
+  "描述固定在轮次 \u0000"
+ ],
+ [
+  "connection dropped, retrying (\u0000)…",
+  "连接中断，正在重试（\u0000）…"
+ ],
+ [
+  "crop \u0000×\u0000 of \u0000×\u0000 → \u0000×\u0000",
+  "裁切 \u0000×\u0000，原图 \u0000×\u0000 → \u0000×\u0000"
+ ],
+ [
+  "cutoff \u0000%). Review before moving: it flags statistical drift, not certainty.",
+  "阈值 \u0000%）。移动前请复核：它标记的是统计漂移，不是确定的结论。"
+ ],
+ [
+  "more (\u0000 of \u0000 seen).",
+  "更多（已看到 \u0000 / \u0000）。"
+ ],
+ [
+  "page \u0000 of \u0000",
+  "第 \u0000 / \u0000 页"
+ ],
+ [
+  "render\u0000 this",
+  "渲染\u0000 这个"
+ ],
+ [
+  "render is the base model plus your LoRAs at the steps set (raise Steps to \u0000). That is also how you edit a",
+  "渲染结果是基础模型加上你的 LoRA，按设定的步数运行（把步数提高到 \u0000）。这也是你编辑一个"
+ ],
+ [
+  "the watch's verdicts as of epoch \u0000",
+  "截至轮次 \u0000 的监测结论"
+ ],
+ [
+  "· \u0000 more queued",
+  "· 还有 \u0000 个排队"
+ ],
+ [
+  "· \u0000 other LoRA\u0000 in these folders hidden",
+  "· 这些文件夹里还有 \u0000 个 LoRA\u0000 已隐藏"
+ ],
+ [
+  "· and \u0000 more",
+  "· 还有 \u0000 个"
+ ],
+ [
+  "· average over \u0000 epoch\u0000:",
+  "· \u0000 个轮次的平均："
+ ],
+ [
+  "· best \u0000% at \u0000",
+  "· 最佳 \u0000%，在 \u0000"
+ ],
+ [
+  "· every \u0000th step drawn",
+  "· 每 \u0000 步绘制一次"
+ ],
+ [
+  "· page \u0000 of \u0000",
+  "· 第 \u0000 / \u0000 页"
+ ],
+ [
+  "✨ Prepare \u0000 Image\u0000 Now",
+  "✨ 立即准备 \u0000 图片\u0000"
+ ],
+ [
+  "⬆ Fizgig \u0000 is available",
+  "⬆ Fizgig \u0000 可用"
+ ],
+ [
+  "🔒 Freeze tweaked\u0000",
+  "🔒 冻结调整后\u0000"
  ]
 ]

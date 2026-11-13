@@ -1,0 +1,4 @@
+# Windows 批处理必须是 CRLF：cmd.exe 解析 LF-only 的 .bat 时，
+# 多行 if (...) 块和标签会错位（上游 Fizgig 的 .gitattributes 里也有同样的规定）。
+*.bat text eol=crlf
+*.cmd text eol=crlf
