@@ -9,7 +9,7 @@
 
 **适配版本：Fizgig v9.6.1（2026-11-13，commit f7c8d48f）**
 
-**下载**：不想用 git 的话，下载 [`fizgig-zh-patch-v9.6.1.zip`](fizgig-zh-patch-v9.6.1.zip)，解压后把 `zh_patch` 文件夹放进 Fizgig 根目录即可。
+**下载**：到 [Releases 页面](https://github.com/dhhxfggg2023/fizgig-zh-patch/releases/latest) 下载 `fizgig-zh-patch-v9.6.1.zip`，解压后把 `zh_patch` 文件夹放进 Fizgig 根目录即可。
 
 ---
 
@@ -144,7 +144,7 @@ src/fizgig/web/static/style.css
 |---|---|
 | **`一键汉化.bat`** / **`一键还原英文.bat`** | 双击切换中英文 |
 | **`一键更新并汉化.bat`** | 更新 Fizgig 后再汉化（推荐用它更新） |
-| **`fizgig-zh-patch-v9.6.1.zip`** | 打包好的下载包（内容与仓库相同，解压即用） |
+| **Releases 里的 zip** | 打包好的下载包（内容与仓库相同，解压即用） |
 | `install.py` | 安装 / 卸载 / 状态 / 体检 |
 | `update_zh.py` | 更新流程（还原 → 官方更新 → 重新汉化） |
 | `toggle_zh.py` | `一键汉化.bat` 背后调用的切换脚本 |
