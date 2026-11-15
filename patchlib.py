@@ -144,7 +144,12 @@ DISPLAY_PROP = re.compile(
 DISPLAY_ASSIGN = re.compile(
     r"(?:textContent|innerHTML|innerText|outerHTML|placeholder|title|"
     r"ariaLabel|aria-label)\s*=\s*[^=]$")
-COMPARE = re.compile(r"(?:===|!==|==|!=)\s*$")
+DISPLAY_SINK = re.compile(
+    r"(?<![-\w])(?:text|label|title|placeholder|hint|note|desc|description|"
+    r"caption|message|msg|heading|header|badge|tooltip|alt)\s*:\s*"
+    r"|(?:textContent|innerHTML|innerText|outerHTML|placeholder|title|"
+    r"ariaLabel|aria-label|insertAdjacentHTML)\s*=\s*")
+COMPARE = re.compile(r"(?:===|!==|==|!=)\s*[\"\'\`]")
 # A literal that is one piece of a "..." + x + "..." chain still reaches the
 # screen when the chain is assigned to a display sink, so look back past the
 # whole statement instead of only at the text right before the quote.
@@ -244,6 +249,134 @@ def template_static_segments(src, start, end):
     return segs
 
 
+QUOTES = '"' + "'" + "`"
+SEMI_NL = ";" + "\n"
+
+
+def _skip_space(src, i):
+    n = len(src)
+    while i < n and src[i] in " \t\r\n":
+        i += 1
+    return i
+
+
+def _end_of_literal(src, i):
+    """Index just past the literal whose quote is at i."""
+    n = len(src)
+    q = src[i]
+    j = i + 1
+    while j < n:
+        if src[j] == "\\":
+            j += 2
+            continue
+        if src[j] == q:
+            return j + 1
+        if q != "`" and src[j] == "\n":
+            return j
+        j += 1
+    return n
+
+
+def _match_paren(src, i):
+    """Index just past the ")" matching the "(" at i."""
+    depth = 0
+    n = len(src)
+    while i < n:
+        c = src[i]
+        if c == "(":
+            depth += 1
+        elif c == ")":
+            depth -= 1
+            if depth == 0:
+                return i + 1
+        elif c in "\"'`":
+            i = _end_of_literal(src, i) - 1
+        i += 1
+    return n
+
+
+def _strip_strings(frag):
+    """Replace every quoted run in frag with a single space."""
+    out = []
+    i = 0
+    n = len(frag)
+    while i < n:
+        c = frag[i]
+        if c in QUOTES:
+            q = c
+            i += 1
+            if q == chr(96):
+                while i < n:
+                    if frag[i] == chr(92):
+                        i += 2
+                        continue
+                    if frag[i] == q:
+                        i += 1
+                        break
+                    i += 1
+            else:
+                while i < n:
+                    if frag[i] == chr(92):
+                        i += 2
+                        continue
+                    if frag[i] == q:
+                        i += 1
+                        break
+                    if frag[i] == chr(10):
+                        break
+                    i += 1
+            out.append(" ")
+            continue
+        out.append(c)
+        i += 1
+    return "".join(out)
+
+
+def chain_sink_class(src, start):
+    """"display" when the literal at start is part of a chain that lands in a
+    display sink, else None.
+
+    A statement that builds one message by joining literals:
+
+        el("div", {class: "field-hint", text: "Each line is one image's loss " +
+          "minus the dataset's average at the same noise level, " +
+          "epoch by epoch. " + "All tiles share one scale."})
+
+    Every literal in that chain reaches the screen, but the text right before
+    a literal in the middle of the chain is only a trailing "+", so the
+    ordinary classifier gives up on it. Here the chain is followed back to the
+    property that receives it ("text:" above) and what sits in between is
+    checked: no other property, no statement break, no new object.
+    """
+    lo = max(0, start - 1500)
+    region = src[lo:start]
+    sinks = list(DISPLAY_SINK.finditer(region))
+    if not sinks:
+        return None
+    between = region[sinks[-1].end():]
+    if len(between) > 1500:
+        return None
+    stripped = _strip_strings(between)
+    if ";" in stripped or "{" in stripped or "}" in stripped:
+        return None
+    if re.search(r"[A-Za-z_$][\w$]*\s*:", stripped):
+        return None
+    return "display"
+
+
+def cls_is_unknown(before):
+    """True when the text right before the literal gives no hint at all."""
+    if COMPARE.search(before[-8:]) or CASE.search(before) or TAGCALL.search(before):
+        return False
+    if VALUE_PROP.search(before) or DISPLAY_PROP.search(before):
+        return False
+    if DISPLAY_ASSIGN.search(before):
+        return False
+    if KEYLIKE.search(before):
+        return False
+    return True
+
+
 def js_occurrences(src):
     out = []
     for start, end, quote in js_literal_spans(src):
@@ -271,7 +404,7 @@ def js_occurrences(src):
         txt = norm_ws(unescape(raw))
         if not txt or not re.search(r"[A-Za-z]", txt):
             continue
-        if COMPARE.search(before):
+        if COMPARE.search(before[-8:] + quote):
             cls = "value"
         elif CASE.search(before):
             cls = "value"
@@ -286,6 +419,9 @@ def js_occurrences(src):
         elif DISPLAY_ASSIGN.search(before):
             cls = "display"
         elif CHAIN_DISPLAY.search(before.rsplit(";", 1)[-1]):
+            cls = "display"
+        elif cls_is_unknown(before) and chain_sink_class(src, start) == "display":
+            # a literal in an "a" + "b" chain: the chain's sink decides
             cls = "display"
         else:
             cls = "unknown"
@@ -316,7 +452,9 @@ def occurrences_for(name, src):
 def comparison_literals(src):
     out = set()
     for start, end, quote in js_literal_spans(src):
-        if re.search(r"(?:===|!==|==|!=)\s*$", src[max(0, start - 40):start]):
+        if quote == "`":
+            continue          # a template's parts are translated on purpose
+        if COMPARE.search(src[max(0, start - 8):start] + quote):
             out.add(src[start:end])
     return out
 
@@ -338,7 +476,7 @@ def load_conflicts(path):
 # said about it. This is the last line of defence: a mangled string literal
 # would break the whole script.
 CODE_GUARD = re.compile(
-    r"[{}<>|\\]|=>|\$\(|\)\s*$|\(\s*$|\+\s*$|^\s*[,;)]|^\s*\+ |^\s*\)"
+    r"[{}<>|\\]|=>|\$\(|\(\s*$|\+\s*$|^\s*[,;)]|^\s*\+ |^\s*\)"
     r"|^\s*\.|\bfunction\b|\.\w+\(|\breturn\b|\bvar\b|\blet\b|\bconst\b"
     r"|^\s*/|^\s*[a-z_]+:\s*$|\bnew\s+\w+\(|=>|;$")
 
@@ -356,6 +494,8 @@ def looks_like_code(t):
         return True
     if CODE_GUARD.search(t):
         return True
+    if re.match(r"^[A-Za-z_$][\w$.]*\([^)]*\)$", t) and " " not in t:
+        return True          # a bare call such as fn(x), not prose
     if re.match(r"^/api/", t):
         return True
     if re.match(r"^[\w.-]+\.(js|py|json|css|html|txt|png|jpg|mp4|zip)$", t, re.I):
