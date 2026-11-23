@@ -13,7 +13,7 @@
   var SKIP = Object.create(null);
   (PACK.skip || []).forEach(function (k) { SKIP[k] = 1; });
 
-  var MAXLEN = 600;
+  var MAXLEN = 2000;  /* long hints (e.g. the People-mode card) exceed 600 chars */
   var HOLE = "\u0000";
 
   function esc(s) { return s.replace(/[.*+?^$(){}|[\]\\]/g, "\\$&"); }

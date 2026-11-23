@@ -2630,5 +2630,77 @@
  [
   "· \u0000 other run\u0000 have previews here too (pick one above)",
   "· 另有 \u0000 个运行\u0000 在这里也有预览（在上方选一个）"
+ ],
+ [
+  "\u0000 couldn't be deleted: \u0000",
+  "\u0000 无法删除：\u0000"
+ ],
+ [
+  "\u0000 ended more than \u0000 \u0000 ago.",
+  "\u0000 在 \u0000 \u0000 前结束。"
+ ],
+ [
+  "\u0000 file\u0000 a caption: each gets",
+  "\u0000 个文件\u0000字幕：每个都会"
+ ],
+ [
+  "\u0000 file\u0000 more",
+  "\u0000 个文件\u0000更多"
+ ],
+ [
+  "\u0000 files were kept and only the list line went.",
+  "已保留 \u0000 个文件，仅移除了列表行。"
+ ],
+ [
+  "\u0000 shared a name and folder with a run still on the list, so",
+  "\u0000 与列表中的一个运行同名且位于同一文件夹，因此"
+ ],
+ [
+  "Are you really sure you want to \u0000, \u0000?",
+  "确定要\u0000吗，\u0000？"
+ ],
+ [
+  "Downloading \u0000… (the first time only). Stop cancels it.",
+  "正在下载 \u0000…（仅限首次）。停止即取消。"
+ ],
+ [
+  "It carries on from \u0000 \u0000",
+  "它从 \u0000 \u0000 继续"
+ ],
+ [
+  "Loading \u0000 into memory… Stop cancels it.",
+  "正在将 \u0000 加载到内存…停止即取消。"
+ ],
+ [
+  "Nothing ended more than \u0000 \u0000 ago.",
+  "没有发生在 \u0000 \u0000 之前结束的内容。"
+ ],
+ [
+  "The Resume Training box holds \u0000, which isn't a saved state: pick the state folder itself (named like",
+  "“Resume Training”框中的 \u0000 不是已保存的状态：请选择状态文件夹本身（命名类似"
+ ],
+ [
+  "Yes, purge \u0000",
+  "是，清除 \u0000"
+ ],
+ [
+  "delete \u0000 and everything they saved, their finished LoRAs included",
+  "删除 \u0000 及其保存的所有内容，包括已完成的 LoRA"
+ ],
+ [
+  "in this same run, nothing restarts, and the \u0000s and checkpoints it has already saved stay as",
+  "在同一运行中，不会重启，且它已经保存的 \u0000 和 checkpoint 保持原样"
+ ],
+ [
+  "studio_opt_\u0000",
+  "studio_opt_\u0000"
+ ],
+ [
+  "take \u0000 off this list, leaving their LoRAs and everything else they saved where they are",
+  "将 \u0000 从此列表中移除，保留其 LoRA 及其他已保存内容的位置"
+ ],
+ [
+  "💡 Hint: a small dataset. With \u0000 images, MOSS-Image can take longer to converge than other models, so allow more epochs before judging it.",
+  "💡 提示：小数据集。只有 \u0000 张图片时，MOSS-Image 的收敛可能比其他模型慢，请先多训练几个轮次再判断效果。"
  ]
 ]
